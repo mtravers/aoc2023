@@ -1,4 +1,4 @@
-(ns aoc2023.p2
+(ns aoc2023.day2
   (:require [clojure.string :as s]
             [org.candelbio.multitool.core :as u]
             [org.candelbio.multitool.cljcore :as ju])
