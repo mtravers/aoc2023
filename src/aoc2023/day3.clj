@@ -6,6 +6,7 @@
 
 (def array (vec (ju/file-lines "data/day3.txt")))
 
+;;; Test case
 #_
 (def array
   ["467..114.."
@@ -33,7 +34,6 @@
 
 (defn numeric? [char]
   (contains? digits char))
-
 
 (defn in-bounds? [[l i]]
   (and (<= 0 l (count array))
@@ -71,6 +71,10 @@
 
 
 ;;; Part 2
+
+;;; Note: this strategy is a lot more complex than it needs to be. Easier
+;;; to just scan preceding and following lines for numbers and check their position
+;;; I was overly influenced by already having the neighbors machinery from Part 1.
 
 (defn consolidate-neighbors
   [neighbors]
