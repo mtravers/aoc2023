@@ -23,41 +23,46 @@
 
 (defn parse-num-list
   [l]
-  (let [raw (map u/coerce-numeric (s/split l #" +" ))]
-    (set raw)))
+  (map u/coerce-numeric (s/split l #" +" )))
+
+(defn parse-num-set
+    [l]
+  (set (parse-num-list l)))
 
 (defn parse-card-line
   [l]
   (let [[_ card wins haves] (re-matches #"Card +(\d+): +(.*)\| (.*)$" l)]
     [(u/coerce-numeric card)
-     (parse-num-list wins)
-     (parse-num-list haves)]))
+     (parse-num-set wins)
+     (parse-num-set haves)]))
         
+(defn card-matches
+  [[card wins haves]]
+  (count (set/intersection wins haves)))  
+
 ;;; ◡◠ Part 1 ◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠
 
 (defn score-card-line
-  [[card wins haves]]
-  (int (Math/pow 2 (dec (count (set/intersection wins haves))))))
+  [card]
+  (int (Math/pow 2 (dec (card-matches card)))))
 
-(reduce + (map (comp score-card-line parse-card-line) cards))
+(defn part1
+  []
+  (reduce + (map (comp score-card-line parse-card-line) cards)))
 
 ;;; ◡◠ Part 2 ◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠
 
-(defn score-card-line-2
-  [[card wins haves]]
-  (count (set/intersection wins haves)))
-
-(defn total
+(defn part2
   []
   (loop [counts (repeat (count cards) 1)
          i 0
          total 0]
     (if (empty? counts)
       total
-      (let [score (score-card-line-2 (parse-card-line (nth cards i)))
+      (let [score (card-matches (parse-card-line (nth cards i)))
             card-count (first counts)]
         (recur (map + (rest counts) (concat (repeat score card-count) (repeat 0)))
                (inc i)
                (+ total card-count))))))
     
-(total)
+
