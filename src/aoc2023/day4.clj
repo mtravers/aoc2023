@@ -1,5 +1,6 @@
 (ns aoc2023.day4
   (:require [clojure.string :as s]
+            [clojure.set :as set]
             [org.candelbio.multitool.core :as u]
             [org.candelbio.multitool.cljcore :as ju])
   )
@@ -7,6 +8,7 @@
 ;;; Other nice solutions
 ;;; https://github.com/ckainz11/AdventOfCode2023/blob/main/src/main/kotlin/days/day04/Day4.kt
 
+;;; ◡◠ Data ◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠
 
 (def cards (ju/file-lines "data/day4.txt"))
 
@@ -18,7 +20,6 @@
    "Card 4: 41 92 73 84 69 | 59 84 76 51 58  5 54 83"
    "Card 5: 87 83 26 28 32 | 88 30 70 12 93 22 82 36"
    "Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11"])
-   
 
 (defn parse-num-list
   [l]
@@ -32,25 +33,20 @@
      (parse-num-list wins)
      (parse-num-list haves)]))
         
+;;; ◡◠ Part 1 ◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠
+
 (defn score-card-line
   [[card wins haves]]
-  (int (Math/pow 2 (dec (count (clojure.set/intersection wins haves))))))
+  (int (Math/pow 2 (dec (count (set/intersection wins haves))))))
 
 (reduce + (map (comp score-card-line parse-card-line) cards))
 
-;;; Part 2
+;;; ◡◠ Part 2 ◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠◡◠
 
 (defn score-card-line-2
   [[card wins haves]]
-  (count (clojure.set/intersection wins haves)))
+  (count (set/intersection wins haves)))
 
-(u/defn-memoized card-base-score
-    [card-n]
-  (score-card-line-2
-   (parse-card-line
-    (nth cards card-n))))
-
-;;; Not working dammit, not sure why. Does OK on test case.
 (defn total
   []
   (loop [counts (repeat (count cards) 1)
@@ -58,10 +54,10 @@
          total 0]
     (if (empty? counts)
       total
-      (let [score (card-base-score i)
+      (let [score (score-card-line-2 (parse-card-line (nth cards i)))
             card-count (first counts)]
-        (prn :x i score card-count total counts)
         (recur (map + (rest counts) (concat (repeat score card-count) (repeat 0)))
                (inc i)
                (+ total card-count))))))
     
+(total)
