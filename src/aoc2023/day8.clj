@@ -2,7 +2,9 @@
   (:require [clojure.string :as s]
             [clojure.set :as set]
             [org.candelbio.multitool.core :as u]
-            [org.candelbio.multitool.cljcore :as ju])
+            [org.candelbio.multitool.cljcore :as ju]
+            [clojure.math.numeric-tower :as mnt]
+            )
   )
 
 ;;; Data
@@ -43,6 +45,7 @@
              (mod (inc i) (count moves))
              (inc counter)))))
 
+;;; Doesn't work. Blows out stack, which is weird, but in any case this is too brute-force
 (defn part2
   [{:keys [moves nodes]}]
   (loop [current (filter #(= \A (nth % 2)) (keys nodes))
@@ -56,5 +59,22 @@
                   current)
              (mod (inc i) (count moves))
              (inc counter)))))
-         
+
+(defn part2a
+  [{:keys [moves nodes]}]
+  (let [seeds (filter #(= \A (nth % 2)) (keys nodes))
+        counts (map (fn [seed]
+                       (loop [current seed
+                              i 0
+                              counter 0]
+                         (if (= \Z (nth current 2))
+                           counter
+                           (recur (case (get moves i)
+                                    \L (get-in nodes [current 2])
+                                    \R (get-in nodes [current 3]))
+                                  (mod (inc i) (count moves))
+                                  (inc counter)))))
+                    seeds)]
+    (reduce mnt/lcm counts)))
+    
     

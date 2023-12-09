@@ -61,18 +61,12 @@
   [c]
   (- (s/index-of cards2 c)))
 
-;;; Multitool! But needs a better implementation
-(defn bag=
-  [seq1 seq2]
-  (and (= (count seq1) (count seq2))
-       (= (sort seq1) (sort seq2))))
-
 ;;; Full house cases AAABB JAABB
 (defn full-house
   [freqs]
-  (or (bag= (vals freqs) [3 2])
+  (or (u/bag= (vals freqs) [3 2])
       (and (= 1 (get freqs \J))
-           (bag= (vals freqs) [1 2 2]))))
+           (u/bag= (vals freqs) [1 2 2]))))
   
 ;;; You can't have a two-pair hand with a J so this is simple
 (defn two-pair
