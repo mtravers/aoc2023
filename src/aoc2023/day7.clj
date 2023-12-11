@@ -6,6 +6,7 @@
   )
 
 ;;; Data
+
 (def data
   (-> "data/day7.txt"
       ju/file-lines

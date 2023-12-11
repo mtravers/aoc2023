@@ -22,10 +22,11 @@
    \F [[0 1] [1 0]]
    \S [[0 1] [0 -1] [1 0] [-1 0]]       ;iffy
    })
-  ;;. is ground; there is no pipe in this tile.
+;; . is ground; there is no pipe in this tile.
 ;; S is the starting position of the animal; there is a pipe on this tile, but your sketch doesn't show what shape the pipe has.])
 
 (def +* (u/vectorize +))
+(def -* (u/vectorize -))
 
 (defn char-at
   [data [i j]]
@@ -48,11 +49,13 @@
             [i j]))
         (range (count data))))
 
+;;; Multitool
 ;;; AKA lcontains?
 (defn some=
   [v seq]
   (some #(= v %) seq))
 
+;;; Multitool? Needs a better name
 (defn some-uneq-thing
   [v seq]
   (some #(and (not (= v %)) %) seq))
@@ -81,7 +84,83 @@
   (let [start (start data)
         starting-pipe (first (starting-pipes data))
         path (follow data start starting-pipe)]
+    #_ (draw-path data path)
     (/ (dec (count path)) 2)))
+
+(defn draw-path
+  [data path]
+  (let [pathset (set path)]
+    (doseq [j (range (count data))
+            i (range (count (first data)))]
+      (when (= i 0) (newline))
+      (print (if (contains? pathset [i j])
+               (char-at data [i j]) \.)))))        
+      
+
+;;; Part 2
+
+(def decode (set/map-invert code))
+
+(defn normalize-s
+  [data [i j :as spt] path]
+  (let [n0 (-* (second path) spt)
+        n1 (-* (nth path (- (count path) 2)) spt)]
+    (or (get decode [n0 n1])
+        (get decode [n1 n0]))))
+
+(defn path
+  [data]
+  (let [start (start data)
+        starting-pipe (first (starting-pipes data))
+        path (follow data start starting-pipe)]
+    path))
+
+;;; Candidate for multitool, needs better name
+(defn re-seq-p
+  "Returns a lazy sequence of successive matches of pattern in string, returning [start end] pairs"
+  {:added "1.0"
+   :static true}
+  [^java.util.regex.Pattern re s]
+  (let [m (re-matcher re s)]
+    ((fn step []
+       (when (. m (find))
+         (cons [(.start m 0) (.end m 0)] (lazy-seq (step))))))))
+
+;;; Returns a vector of strings (like original data) but only including the actual path, with S restored to a normal pipe.
+(defn path-only-grid
+  [data path]
+  (map-indexed
+   (fn [j line]
+     (loop [[[i _ :as pt] & rest] (filter #(= (second %) j) path)
+            array (vec (repeat (count (first data)) \.))]
+       (if pt
+         (let [raw-char (get line i)
+               char (if (= raw-char \S) (normalize-s data pt path) raw-char)]
+           (recur rest
+                  (assoc array i char)))
+         (apply str array)
+         )))
+   data))
+
+;;; Count inside points using (essentially) the Jordan curve theorem to go line-by-line.
+(defn count-innies
+  [line]
+  (loop [[wall & rest] (re-seq-p #"(F-*J|L-*7|\|)" line) ;find crossings
+         count 0
+         out? false]
+    (if wall
+      (recur rest
+             (if out?
+               count
+               (+ count (get (frequencies (subs line (second wall) (ffirst rest))) \. 0)))
+             (not out?))
+      count)))
+
+(defn solve2
+  [data]
+  (let [path (path data)
+        grid (path-only-grid data path)]
+    (reduce + (map count-innies grid))))
 
 ;;; Tests
 

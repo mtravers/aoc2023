@@ -1,4 +1,15 @@
 * Solutions for [[https://adventofcode.com/2023/][Advent of Code 2023]]
 
-In Clojure!
+In Clojure.
+
+** Approach
+
+In general trying for compactness of solution. Less interested in performance, readability, etc. And not going through a lot of packaging effort.
+
+But also not trying to be overly clever; the code tries to match the problem closely. 
+
+Also trying to come up with good abstractions that I can add to [[https://github.com/CANDELBio/multitool/][multitool]]. Everybody disses utility libraries, but I consider them something like a private toolkit of useful abstractions.
+
+
+
 
