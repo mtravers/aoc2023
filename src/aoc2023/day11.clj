@@ -1,9 +1,6 @@
 (ns aoc2023.day11
-  (:require [clojure.string :as s]
-            [clojure.set :as set]
-            [org.candelbio.multitool.core :as u]
+  (:require [org.candelbio.multitool.core :as u]
             [org.candelbio.multitool.cljcore :as ju]
-            [clojure.math.numeric-tower :as mnt]
             )
   )
 
@@ -12,7 +9,6 @@
 (def data (-> "data/day11.txt"
               ju/file-lines
               vec))
-
 
 (def test
   ["...#......"

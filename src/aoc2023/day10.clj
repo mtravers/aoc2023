@@ -116,15 +116,16 @@
     path))
 
 ;;; Candidate for multitool, needs better name
+;;; Based on clojure.core/re-seq
 (defn re-seq-p
   "Returns a lazy sequence of successive matches of pattern in string, returning [start end] pairs"
-  {:added "1.0"
-   :static true}
   [^java.util.regex.Pattern re s]
   (let [m (re-matcher re s)]
-    ((fn step []
-       (when (. m (find))
-         (cons [(.start m 0) (.end m 0)] (lazy-seq (step))))))))
+    (loop [result []]
+      (if (.find m)
+        (recur (conj result [(.start m 0) (.end m 0)]))
+        result))))
+
 
 ;;; Returns a vector of strings (like original data) but only including the actual path, with S restored to a normal pipe.
 (defn path-only-grid
