@@ -6,5 +6,6 @@
                  [org.candelbio/multitool "0.1.0"]
                  [org.clojure/math.numeric-tower "0.0.5"]
                  [org.clojure/math.combinatorics "0.2.0"]
+                 [io.github.nextjournal/clerk "0.15.957"]
                  ]
   :repl-options {:init-ns aoc2023.core})
